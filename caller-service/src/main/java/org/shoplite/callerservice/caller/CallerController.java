@@ -23,6 +23,7 @@ public class CallerController {
                 .map(CallerServiceResponse::new)
                 .map(ResponseEntity::ok)
                 .onErrorResume(ex ->
-                        Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build()));
+                        Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CallerServiceResponse("Upstream call failed: " + ex.getClass().getSimpleName()
+                        + ex.getMessage()))));
     }
 }

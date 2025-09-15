@@ -1,0 +1,32 @@
+services:
+  hello:
+    build:
+      context: ./hello-service
+    container_name: hello
+    environment:
+      SPRING_PROFILES_ACTIVE: "local"
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8081/actuator/health"]
+      interval: 10s
+      timeout: 2s
+      retries: 5
+
+  caller:
+    build:
+      context: ./caller-service
+    container_name: caller
+    depends_on:
+      hello:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: "local"
+      HELLO_URL: "http://hello:8081"
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 2s
+      retries: 5
